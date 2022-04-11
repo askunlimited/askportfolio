@@ -1,0 +1,80 @@
+Working on a Django App API.
+Workflow pattern.
+
+=================================
+Models.py
+
+Basic Import is.
+from django.db import models
+
+Then you create the class.
+
+class Product(models.Model):
+======then you create the model Fields===============
+    title = models.CharField(max_length=200)
+
+   ====and create the class Meta: Model Meta is basically used to change the behavior of your model fields like changing order options,verbose_name and lot of other options.============
+   
+    class Meta:
+        verbose_name = 'About'
+        verbose_name_plural = 'About'
+
+   ====and define the string============
+    def __str__(self):
+        return self.title
+
+
+
+===========================================
+Work on the serializer.
+
+Serializer.py
+
+from rest_framework import serializers
+from .models import About
+
+
+class AboutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = About
+        fields = '__all__'
+
+
+==============Views======================
+
+from rest_framework.generics import ListAPIView
+from rest_framework import permissions
+
+from .models import Project
+from .serializers import ProjectSerializer
+
+class ProjectListView(ListAPIView):
+    permission_classes = (permissions.AllowAny, )
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    pagination_class = None
+
+
+
+===============urls==========================
+from django.urls import path
+from .views import ProjectListView
+
+urlpatterns = [
+    path('', ProjectListView.as_view()),
+]
+
+
+
+=============admin===========================
+from django.contrib import admin
+from .models import Project
+
+
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ('id', 'title', 'description', 'url', 'image')
+    list_display_links = ('id', 'title')
+    search_fields = ('title', 'image')
+    list_per_page = 20
+
+admin.site.register(Project, ProjectAdmin)
